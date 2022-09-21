@@ -4,8 +4,17 @@ import torch
 
 
 def xyxy_to_cxcywh(xyxy):
-    # convert [x1, y1, x2, y2] box format to [cX, cY, w, h] box format
-    # xyxy must not be a normalized box
+    """
+    Function to convert [x_min, y_min, x_max, y_max] to [cx, cy, w, h] box format
+    Args:
+        xyxy: bbox of format [x_min, y_min, x_max, y_max]
+    Example:
+        >>> xyxy = np.asarray([
+        >>>     [100, 100, 200, 200]
+        >>> ], dtype=np.int_)
+        >>> cxcywh = xyxy_to_cxcywh(xyxy)
+        >>> print(cxcywh)
+    """
     if isinstance(xyxy, (list, tuple)):
         assert len(xyxy) == 4
         cX = round((xyxy[0] + xyxy[2]) / 2)
@@ -34,8 +43,17 @@ def xyxy_to_cxcywh(xyxy):
 
 
 def cxcywh_to_xyxy(xywh):
-    # Convert [cx cy w h] box format to [x1 y1 x2 y2] format.
-    # xywh must not be a normalized box
+    """
+    Function to convert [cx, cy, w, h] to [x_min, y_min, x_max, y_max] box format
+    Args:
+        xywh: bbox of format [cx, cy, w, h]
+    Example:
+        >>> xywh = np.asarray([
+        >>>     [150, 150, 100, 100]
+        >>> ], dtype=np.int_)
+        >>> xyxy = cxcywh_to_xyxy(xywh)
+        >>> print(xyxy)
+    """
     if isinstance(xywh, (list, tuple)):
         assert len(xywh) == 4
         return [int(xywh[0] - xywh[2]/2),int(xywh[1] - xywh[3]/2),
@@ -55,6 +73,17 @@ def cxcywh_to_xyxy(xywh):
 
 
 def xyxy_to_xywh(xyxy):
+    """
+    Function to convert [x_min, y_min, x_max, y_max] to [x_min, y_min, w, h] box format
+    Args:
+        xyxy: bbox of format [x_min, y_min, x_max, y_max]
+    Example:
+        >>> xyxy = np.asarray([
+        >>>     [100, 100, 200, 200]
+        >>> ], dtype=np.int_)
+        >>> xywh = xyxy_to_xywh(xyxy)
+        >>> print(xywh)
+    """
     if isinstance(xyxy, (list, tuple)):
         assert len(xyxy) == 4
         w = xyxy[2] - xyxy[0]
@@ -71,6 +100,17 @@ def xyxy_to_xywh(xyxy):
 
 
 def xywh_to_xyxy(xywh):
+    """
+    Function to convert [x_min, y_min, w, h] to [x_min, y_min, x_max, x_max] box format
+    Args:
+        xyxy: bbox of format [x_min, y_min, w, h]
+    Example:
+        >>> xywh = np.asarray([
+        >>>     [100, 100, 100, 100]
+        >>> ], dtype=np.int_)
+        >>> xyxt = xyxy_to_xywh(xywh)
+        >>> print(xyxy)
+    """
     if isinstance(xywh, (list, tuple)):
         assert len(xywh) == 4
         x2 = xywh[0] + xywh[2]
@@ -87,7 +127,19 @@ def xywh_to_xyxy(xywh):
 
 
 def scale_box(img, box):
-    """ Scale normalized box w.r.t to image height and width """
+    """ Scale normalized box w.r.t to image height and width
+    Args:
+        img: image of type numpy array or torch Tensor
+        box: box of format xyxy or cxcywh (haven't tested with xywh)
+    Example:
+        >>> image = np.zeros((300, 300, 3))
+        >>> norm_xyxy = np.asarray([
+        >>>     [0.333, 0.333, 0.667, 0.667]
+        >>> ])
+        >>> xyxy = scale_box(image, norm_xyxy)
+        >>> print(xyxy)
+        [[100 100 200 200]]
+    """
     if isinstance(box, (tuple, list)):
         h, w = img.shape[:2]
         nb1 = round(box[0] * w)
@@ -115,7 +167,19 @@ def scale_box(img, box):
 
 
 def normalize_box(img, box):
-    """ Normalize any box format w.r.t image size """
+    """ Normalize any box format w.r.t image size
+    Args:
+        img: image of type numpy array or torch Tensor
+        box: box of format xyxy or cxcywh (haven't tested with xywh)
+    Example:
+        >>> image = np.zeros((300, 300, 3))
+        >>> xyxy = np.asarray([
+        >>>     [100, 100, 200, 200]
+        >>> ])
+        >>> norm_xyxy = normalize_box(image, xyxy)
+        >>> print(norm_xyxy)
+         [[0.333333 0.333333 0.666667 0.666667]]
+    """
     if isinstance(box, (tuple, list)):
         height, width = img.shape[:2]
         return [round(box[0] / width, 6), round(box[1] / height, 6), round(box[2] / width, 6), round(box[3] / height, 6)]
